@@ -1,2 +1,4 @@
-data/db/mysql/**
-wp-sources/**
+data/db/mysql/*
+!data/db/mysql/
+wp-sources/*
+!wp-sources/
