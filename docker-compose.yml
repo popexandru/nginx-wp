@@ -1,0 +1,62 @@
+version: '3'
+
+services:
+
+    nginx:
+        build:
+            context: .
+            dockerfile: _nginx.dockerfile
+        image: i-nginx
+        container_name: c-nginx
+        ports:
+            - 8080:8080
+        volumes:
+            - ./wp-sources:/var/www/html
+            - ./nginx/conf.d:/etc/nginxconf.d
+        links:
+            - wp
+
+    mariadb:
+        image: mariadb
+        restart: always
+        ports:
+            - 3306:3306
+        environment:
+            MYSQL_DATABASE: nginx-wp
+            MYSQL_USER: root
+            MYSQL_PASSWORD: root
+            MYSQL_ROOT_PASSWORD: root
+        volumes:
+             - ./data/db/mysql:/var/lib/mysql
+
+    wp:
+        build:
+            context: .
+            dockerfile: _wp.dockerfile
+        image: i-wp
+        container_name: c-wp
+        expose:
+            - 9000
+        restart: always
+        volumes:
+            - ./wp-sources:/var/www/html
+        links:
+            - mariadb
+        depends_on:
+            - mariadb
+        environment:
+            WORDPRESS_DB_HOST: mariadb
+            WORDPRESS_DB_NAME: nginx-wp
+            WORDPRESS_DB_USER: root
+            WORDPRESS_DB_PASSWORD: root
+            WORDPRESS_TABLE_PREFIX: wp_
+
+    phpmyadmin:
+        image: phpmyadmin/phpmyadmin
+        restart: always
+        ports:
+            - 8081:80
+        environment:
+            PMA_HOST: mariadb
+        depends_on:
+            - mariadb
