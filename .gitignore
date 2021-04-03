@@ -1,4 +1,0 @@
-data/db/mysql/*
-!data/db/mysql/
-wp-sources/*
-!wp-sources/
